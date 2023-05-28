@@ -8,23 +8,31 @@ export type FastifyPluginAsyncZod<
 > = FastifyPluginAsync<Options, Server, ZodTypeProvider>;
 
 const route: FastifyPluginAsyncZod = async (app, opt) => {
-    app.get('/name', {
+    app.get('/name/:age', {
         schema: {
             tags: ['name'],
+            consumes: ['application/x-www-form-urlencoded'],
+            produces: ['application/json'],
+            params: z.object({
+                age: z.string(),
+            }),
             querystring: z.object({
                 name: z.string().optional(),
             }),
             response: {
                 200: z.object({
-                    hello: z.string(),
+                    name: z.string(),
                     success: z.string(),
+                    age: z.string(),
                 }),
             },
         },
         handler: async (req, reply) => {
+            console.log(req);
             return {
-                hello: req.query.name ?? 'World',
+                name: req.query.name ?? 'World',
                 success: 'ok',
+                age: req.params.age ?? 18,
             };
         },
     });
